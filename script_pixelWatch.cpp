@@ -3,51 +3,57 @@
 
 using namespace std;
 
+int main() {
+    // get resolution
+    int screenWidth = GetSystemMetrics(SM_CXSCREEN);
+    int screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
-int main(){
-    //get resolutin monitor
-    int screenWidth = GetSystemMetrix(SM_CXSCREEN);
-    int screenHeight = GetSystemMetrix(SM_CYSCREEN);
-
-    //center monitor
+    // center monitor
     int centerx = screenWidth / 2;
     int centery = screenHeight / 2;
+    
+    // Получение контекста устройства (DC) экрана
+    HDC screenDC = GetDC(NULL);
+    if (!screenDC) { 
+        cout << "Failed to get screen DC" << endl;
+        return 1;
+    }
 
-    //record colot pixel
-    COLOROREF originalColor = GetPixel(centerx, centery);
+    // record color pixel
+    COLORREF originalColor = GetPixel(screenDC, centerx, centery);
 
-    cout << "the colot has bin recorded";
+    cout << "The color has been recorded... Press ESC to exit" << endl;
 
     while (true)
     {   
-        COLORPREF currColor = GerPixel(centerx, centery);
+        // ::
+        COLORREF currColor = GetPixel(screenDC, centerx, centery);
 
-        //check the color change
+        // chek the color change
         if (currColor != originalColor)
         {
+            // 
+            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+            cout << "Pixel color has changed, clicking button" << endl;
             
-            mouse_event (MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-            mouse_event (MOUSEEVENTF_LEFTUP 0, 0, 0, 0);
+            Sleep(500);
 
-            cout << "pixel has been change color, press button" << endl;
-            
-            sleep(500);
-
-            //update color
-            originalColor = GetPixel(centerx, centery);
-
-
+            // update color
+            originalColor = GetPixel(screenDC, centerx, centery);
         }
         
-        sleep(20);
+        Sleep(20);
 
-        if (GetAsyncKeyState(VK_ECSAPE))
+        // 
+        if (GetAsyncKeyState(VK_ESCAPE))
         {
             break;
         }
-        
     }
 
-
+    //
+    ReleaseDC(NULL, screenDC);
     return 0;
 }
