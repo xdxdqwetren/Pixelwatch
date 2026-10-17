@@ -22,32 +22,50 @@ int main() {
     // record color pixel
     COLORREF originalColor = GetPixel(screenDC, centerx, centery);
 
-    cout << "The color has been recorded... Press ESC to exit" << endl;
 
-    while (true)
-    {   
-        // ::
-        COLORREF currColor = GetPixel(screenDC, centerx, centery);
+    bool botEnable = false;// flag position bot
+    cout << "bot started. Press F3 for turn on / off... Press ESC to exit" << endl;
 
-        // chek the color change
-        if (currColor != originalColor)
-        {
-            // 
-            mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+    
+    while (true){   
+        if (GetAsyncKeyState(VK_F3) & 0x8000){
+            botEnable = !botEnable;
+            if (botEnable){
+                cout << "bot activated" << endl;
+                originalColor = GetPixel(screenDC, centerx, centery);
 
-            cout << "Pixel color has changed, clicking button" << endl;
             
-            Sleep(500);
-
-            // update color
-            originalColor = GetPixel(screenDC, centerx, centery);
+            }else{
+                cout << "bot unactivate" << endl;
+            }
+            Sleep(300);
         }
+        
+        
+        if (botEnable){
+            // ::
+            COLORREF currColor = GetPixel(screenDC, centerx, centery);
+
+            if (currColor != originalColor){
+                // 
+                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
+                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+
+                cout << "Pixel color has changed, clicking button" << endl;
+                
+                Sleep(500);
+
+                // update color
+                originalColor = GetPixel(screenDC, centerx, centery);
+            
+            }
+        }
+    
         
         Sleep(20);
 
         // 
-        if (GetAsyncKeyState(VK_ESCAPE))
+        if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
         {
             break;
         }
@@ -55,5 +73,7 @@ int main() {
 
     //
     ReleaseDC(NULL, screenDC);
+    cout << "bot closed. Bye!" << endl;
+    
     return 0;
 }
