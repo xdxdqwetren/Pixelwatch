@@ -1,7 +1,46 @@
 #include <iostream>
 #include <windows.h>
+#include <cmath>
+#include <random>
 
 using namespace std;
+
+//number generation configuration
+random_device rd;
+mt19937 gen(rd());
+
+//func for a random Delay
+int GetRandomDelay(int minDelay, int maxDelay){
+    uniform_int_distribution<> distr(minDelay, maxDelay);
+    return distr(gen);
+}
+
+
+//func for a safe click by SENDINPUT
+void MouseClick(){
+    INPUT input = {};
+    input.type = INPUT_MOUSE;
+
+    input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+    SendInput(1, &input, sizeof(INPUT));
+
+    Sleep(GetRandomDelay(30, 70));
+    
+    input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+    SendInput(1, &input, sizeof(INPUT));
+
+}   
+
+//func for checking, how much color was change
+bool IsColorChanged (COLORREF c1, COLORREF c2, int tolerance = 25){
+    int r1 = GetRValue(c1), g1 = GetGValue(c1), b1 = GetBValue(c1);
+    int r2 = GetRValue(c2), g2 = GetGValue(c2), b2 = GetBValue(c2);
+
+    return (abs (r1 - r2) > tolerance ||
+            abs (g1 - g2) > tolerance ||
+            abs (b1 - b2) > tolerance);
+    
+}
 
 int main() {
     // get resolution
@@ -34,7 +73,7 @@ int main() {
                 cout << "bot activated" << endl;
                 originalColor = GetPixel(screenDC, centerx, centery);
 
-            
+
             }else{
                 cout << "bot unactivate" << endl;
             }
@@ -46,11 +85,10 @@ int main() {
             // ::
             COLORREF currColor = GetPixel(screenDC, centerx, centery);
 
-            if (currColor != originalColor){
-                // 
-                mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
-                mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            if (IsColorChanged(originalColor, currColor, 30)){
+                Sleep(GetRandomDelay(120, 210));
 
+                MouseClick();
                 cout << "Pixel color has changed, clicking button" << endl;
                 
                 Sleep(500);
